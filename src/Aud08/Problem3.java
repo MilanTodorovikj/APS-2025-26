@@ -1,6 +1,5 @@
 package Aud08;
 
-
 import Aud08.binarysearchtree.BNode;
 import Aud08.binarysearchtree.BinarySearchTree;
 
@@ -9,29 +8,40 @@ import java.util.Scanner;
 public class Problem3 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-//        Scanner sc = new Scanner("9\n8 2 11 1 5 19 3 6 13");
-//        Scanner sc = new Scanner("10\n8 2 11 1 5 10 19 3 6 13");
-        int n = sc.nextInt();
+//        Scanner sc = new Scanner("9 1\n8 2 11 1 5 19 3 6 13");
+//        Scanner sc = new Scanner("9 2\n8 2 11 1 5 19 3 6 13");
+//        Scanner sc = new Scanner("9 4\n8 2 11 1 5 19 3 6 13");
+//        Scanner sc = new Scanner("9 6\n8 2 11 1 5 19 3 6 13");
+//        Scanner sc = new Scanner("9 9\n8 2 11 1 5 19 3 6 13");
+//        Scanner sc = new Scanner("10 4\n8 2 11 1 5 10 19 3 6 13");
+//        Scanner sc = new Scanner("10 9\n8 2 11 1 5 10 19 3 6 13");
+        int n = sc.nextInt(), k = sc.nextInt();
         BinarySearchTree<Integer> bst = new BinarySearchTree<>();
         for (int i = 0; i < n; i++) bst.insert(sc.nextInt());
-        if(isBalanced(bst)) System.out.println("YES");
-        else System.out.println("NO");
+        System.out.println(k + "`th largest is " + kthLargest(bst, k));
     }
 
-    private static boolean isBalanced(BinarySearchTree<Integer> bst) {
-        return isBalancedSubtree(bst.getRoot());
+    private static int kthLargest(BinarySearchTree<Integer> bst, int k) {
+        return kthLargestInSubtree(bst.getRoot(), k);
     }
 
-    private static boolean isBalancedSubtree(BNode<Integer> node) {
-        if (node == null) return true;
-        int leftHeight = subtreeHeight(node.left);
-        int rightHeight = subtreeHeight(node.right);
-        return Math.abs(leftHeight - rightHeight) <= 1 && isBalancedSubtree(node.left) && isBalancedSubtree(node.right);
+    private static int kthLargestInSubtree(BNode<Integer> node, int k) {
+        int rightSubtreeSize = subtreeSize(node.right);
+        if (rightSubtreeSize >= k) return kthLargestInSubtree(node.right, k);
+        else if (rightSubtreeSize + 1 == k) return node.info;
+        return kthLargestInSubtree(node.left, k - rightSubtreeSize - 1);
     }
 
-    private static int subtreeHeight(BNode<Integer> node) {
+    private static int subtreeSize(BNode<Integer> node) {
         if (node == null) return 0;
-        return 1 + Math.max(subtreeHeight(node.left), subtreeHeight(node.right));
+        return 1 + subtreeSize(node.left) + subtreeSize(node.right);
     }
 
+
+    private static int kthSmallestInSubtree(BNode<Integer> node, int k) {
+        int leftSubtreeSize = subtreeSize(node.left);
+        if (leftSubtreeSize >= k) return kthSmallestInSubtree(node.left, k);
+        else if (leftSubtreeSize + 1 == k) return node.info;
+        return kthLargestInSubtree(node.right, k - leftSubtreeSize - 1);
+    }
 }

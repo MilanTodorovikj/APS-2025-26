@@ -8,40 +8,55 @@ import java.util.Scanner;
 public class Problem4 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-//        Scanner sc = new Scanner("9 1\n8 2 11 1 5 19 3 6 13");
+//        Scanner sc = new Scanner("9 8\n8 2 11 1 5 19 3 6 13");
 //        Scanner sc = new Scanner("9 2\n8 2 11 1 5 19 3 6 13");
-//        Scanner sc = new Scanner("9 4\n8 2 11 1 5 19 3 6 13");
+//        Scanner sc = new Scanner("9 4\n8 2 11 1 5 19 3 6 13"); //there is no element 4 in the tree this will throw NullPointerException
 //        Scanner sc = new Scanner("9 6\n8 2 11 1 5 19 3 6 13");
-//        Scanner sc = new Scanner("9 9\n8 2 11 1 5 19 3 6 13");
-//        Scanner sc = new Scanner("10 4\n8 2 11 1 5 10 19 3 6 13");
-//        Scanner sc = new Scanner("10 9\n8 2 11 1 5 10 19 3 6 13");
-        int n = sc.nextInt(), k = sc.nextInt();
+//        Scanner sc = new Scanner("9 9\n8 2 11 1 5 19 3 6 13"); //there is no element 9 in the tree this will throw NullPointerException
+//        Scanner sc = new Scanner("10 13\n8 2 11 1 5 10 19 3 6 13");
+//        Scanner sc = new Scanner("10 1\n8 2 11 1 5 10 19 3 6 13");
+//        Scanner sc = new Scanner("10 19\n8 2 11 1 5 10 19 3 6 13");
+        int n = sc.nextInt();
+        int t = sc.nextInt();
         BinarySearchTree<Integer> bst = new BinarySearchTree<>();
         for (int i = 0; i < n; i++) bst.insert(sc.nextInt());
-        System.out.println(k + "`th largest is " + kthLargest(bst, k));
+        System.out.println("Before " + smaller(bst, t));
+        System.out.println("After " + greater(bst, t));
     }
 
-    private static int kthLargest(BinarySearchTree<Integer> bst, int k) {
-        return kthLargestInSubtree(bst.getRoot(), k);
+    private static int greater(BinarySearchTree<Integer> bst, int t) {
+        if (subtreeMax(bst.getRoot()) == t)
+            return -1; //The biggest number does not have a number written after itself in inorder printing
+        return greaterRecursive(bst.getRoot(), t);
     }
 
-    private static int kthLargestInSubtree(BNode<Integer> node, int k) {
-        int rightSubtreeSize = subtreeSize(node.right);
-        if (rightSubtreeSize >= k) return kthLargestInSubtree(node.right, k);
-        else if (rightSubtreeSize + 1 == k) return node.info;
-        return kthLargestInSubtree(node.left, k - rightSubtreeSize - 1);
+    private static int smaller(BinarySearchTree<Integer> bst, int t) {
+        if (subtreeMin(bst.getRoot()) == t)
+            return -1; //The smallest number does not have a number written before itself in inorder printing
+        return smallerRecursive(bst.getRoot(), t);
     }
 
-    private static int subtreeSize(BNode<Integer> node) {
-        if (node == null) return 0;
-        return 1 + subtreeSize(node.left) + subtreeSize(node.right);
+    private static int greaterRecursive(BNode<Integer> node, int t) {
+        if (node.info < t) return greaterRecursive(node.right, t);
+        if (node.info == t) return subtreeMin(node.right);
+        if (subtreeMax(node.left) == t) return node.info;
+        return greaterRecursive(node.left, t);
     }
 
+    private static int smallerRecursive(BNode<Integer> node, int t) {
+        if (node.info > t) return smallerRecursive(node.left, t);
+        if (node.info == t) return subtreeMax(node.left);
+        if (subtreeMin(node.right) == t) return node.info;
+        return smallerRecursive(node.right, t);
+    }
 
-    private static int kthSmallestInSubtree(BNode<Integer> node, int k) {
-        int leftSubtreeSize = subtreeSize(node.left);
-        if (leftSubtreeSize >= k) return kthSmallestInSubtree(node.left, k);
-        else if (leftSubtreeSize + 1 == k) return node.info;
-        return kthLargestInSubtree(node.right, k - leftSubtreeSize - 1);
+    private static int subtreeMin(BNode<Integer> node) {
+        while (node.left != null) node = node.left;
+        return node.info;
+    }
+
+    private static int subtreeMax(BNode<Integer> node) {
+        while (node.right != null) node = node.right;
+        return node.info;
     }
 }
